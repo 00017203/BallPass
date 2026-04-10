@@ -1,0 +1,123 @@
+.navbar {
+  background: #1a73e8;
+  color: white;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 80%;
+  margin: 40px auto;
+  text-align: center;
+}
+
+h1 {
+  color: #1a73e8;
+}
+
+button {
+  background: #1a73e8;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  margin: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.tickets {
+  margin-top: 20px;
+  display: grid;
+  gap: 15px;
+}
+
+.ticket-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sell-form {
+  max-width: 500px;
+  margin: 30px auto;
+  text-align: center;
+}
+
+.sell-form input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.delete-btn {
+  background: #d9534f;
+  margin-left: 10px;
+}
+
+.search-box {
+  max-width: 500px;
+  margin: 20px auto;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.filter-box {
+  max-width: 500px;
+  margin: 15px auto 25px auto;
+}
+
+.filter-box input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#registerMessage,
+#loginMessage {
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+.navbar button {
+  margin-left: 15px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  background: white;
+  color: #1a73e8;
+  cursor: pointer;
+}

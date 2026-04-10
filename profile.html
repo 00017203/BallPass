@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - BallPass</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body onload="loadProfile()">
+  <nav class="navbar">
+    <h2>BallPass</h2>
+    <div id="navLinks">
+      <a href="index.html">Home</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="ticket-card sell-form">
+      <h1>User Profile</h1>
+      <p><strong>Name:</strong> <span id="profileName">-</span></p>
+      <p><strong>Email:</strong> <span id="profileEmail">-</span></p>
+      <p><strong>Verification:</strong> <span id="profileBadge">Verified Prototype User</span></p>
+      <p><strong>System Role:</strong> Fan User</p>
+    </div>
+
+    <div class="ticket-card sell-form">
+      <h2>Transaction History</h2>
+      <div id="transactionHistory"></div>
+    </div>
+  </div>
+
+  <script>
+    // Loads logged-in user info and transaction history
+    function loadProfile() {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const navLinks = document.getElementById("navLinks");
+
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      navLinks.innerHTML = `
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <button onclick="logout()">Logout</button>
+      `;
+
+      document.getElementById("profileName").textContent = user.name;
+      document.getElementById("profileEmail").textContent = user.email;
+
+      const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      const userTransactions = transactions.filter(t => t.userEmail === user.email);
+
+      const historyDiv = document.getElementById("transactionHistory");
+
+      if (userTransactions.length === 0) {
+        historyDiv.innerHTML = "<p>No transactions yet.</p>";
+        return;
+      }
+
+      historyDiv.innerHTML = userTransactions.map(t => `
+        <div class="ticket-card" style="margin-top: 10px;">
+          <h3>${t.match}</h3>
+          <p><strong>Price:</strong> $${t.price}</p>
+          <p><strong>Location:</strong> ${t.location}</p>
+          <p><strong>Status:</strong> ${t.status}</p>
+        </div>
+      `).join("");
+    }
+
+    // Logs out the current user and takes back to homepage
+    function logout() {
+      localStorage.removeItem("user");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

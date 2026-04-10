@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BallPass</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <h2>BallPass</h2>
+    <div id="navLinks">
+  <a href="index.html">Home</a>
+  <a href="login.html">Login</a>
+  <a href="register.html">Register</a>
+</div>
+  </nav>
+
+  <div class="container">
+    <h1>Football Ticket Exchange Platform</h1>
+    <p>Secure and simple way for fans to buy and sell football tickets.</p>
+
+    <button onclick="loadTickets()">Browse Tickets</button>
+
+    <div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search by match or location" onkeyup="filterTickets()" />
+</div>
+
+    <div class="filter-box">
+  <input type="number" id="maxPrice" placeholder="Maximum price" oninput="filterTickets()" />
+</div>
+
+    <div class="sell-form ticket-card">
+      <h2>Add / Sell a Ticket</h2>
+      <input type="text" id="match" placeholder="Match name" />
+      <input type="number" id="price" placeholder="Price" />
+      <input type="text" id="location" placeholder="Location" />
+      <button onclick="addTicket()">Sell Ticket</button>
+    </div>
+
+    <div id="tickets" class="tickets"></div>
+  </div>
+
+<script>
+  // Stores all tickets from backend
+  let allTickets = [];
+
+  // Loads tickets from backend
+  async function loadTickets() {
+    try {
+      const response = await fetch("/tickets");
+      allTickets = await response.json();
+      displayTickets(allTickets);
+    } catch (error) {
+      console.error("Error loading tickets:", error);
+    }
+  }
+
+  // Displays ticket cards dynamically in the page
+  function displayTickets(tickets) {
+    const ticketsDiv = document.getElementById("tickets");
+    ticketsDiv.innerHTML = "";
+
+    tickets.forEach(ticket => {
+      const card = document.createElement("div");
+      card.className = "ticket-card";
+      card.innerHTML = `
+        <h3>${ticket.match}</h3>
+        <p><strong>Price:</strong> $${ticket.price}</p>
+        <p><strong>Location:</strong> ${ticket.location}</p>
+        <button onclick="buyTicket(${ticket.id})">Buy Ticket</button>
+        <button class="delete-btn" onclick="deleteTicket(${ticket.id})">Delete Ticket</button>
+      `;
+      ticketsDiv.appendChild(card);
+    });
+
+    if (tickets.length === 0) {
+      ticketsDiv.innerHTML = "<p>No tickets found.</p>";
+    }
+  }
+
+  // Filters tickets through search text section as well as price section
+  function filterTickets() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const maxPriceValue = document.getElementById("maxPrice").value;
+
+    const filteredTickets = allTickets.filter(ticket => {
+      const matchesSearch =
+        ticket.match.toLowerCase().includes(searchValue) ||
+        ticket.location.toLowerCase().includes(searchValue);
+
+      const matchesPrice =
+        maxPriceValue === "" || ticket.price <= Number(maxPriceValue);
+
+      return matchesSearch && matchesPrice;
+    });
+
+    displayTickets(filteredTickets);
+  }
+
+  // Sends request to add new ticket
+  async function addTicket() {
+    const match = document.getElementById("match").value;
+    const price = document.getElementById("price").value;
+    const location = document.getElementById("location").value;
+
+    if (!match || !price || !location) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    const response = await fetch("/tickets", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ match, price, location })
+    });
+
+    if (response.ok) {
+      alert("Ticket listed successfully.");
+      document.getElementById("match").value = "";
+      document.getElementById("price").value = "";
+      document.getElementById("location").value = "";
+      loadTickets();
+    } else {
+      alert("Failed to add ticket.");
+    }
+  }
+
+  // Sends request to remove ticket
+  async function deleteTicket(id) {
+    const confirmed = confirm("Are you sure you want to delete this ticket?");
+    if (!confirmed) return;
+
+    const response = await fetch(`/tickets/${id}`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      alert("Ticket deleted successfully.");
+      loadTickets();
+    } else {
+      alert("Failed to delete ticket.");
+    }
+  }
+
+  // Simulates ticket purchase by saving transaction details in localStorage
+  function buyTicket(id) {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      alert("Please login first to buy a ticket.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    const ticket = allTickets.find(t => t.id === id);
+
+    if (!ticket) {
+      alert("Ticket not found.");
+      return;
+    }
+
+    const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    transactions.push({
+      userEmail: user.email,
+      match: ticket.match,
+      price: ticket.price,
+      location: ticket.location,
+      status: "Purchased (Simulated)"
+    });
+
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    alert(`Ticket purchase simulated for ${ticket.match}. Check your profile.`);
+  }
+
+  // Checks whether user is logged in + updates navbar
+  function checkUser() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const navLinks = document.getElementById("navLinks");
+
+    if (!navLinks) return;
+
+    if (user) {
+      navLinks.innerHTML = `
+        <a href="index.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <span style="margin-left:20px; color:white; font-weight:bold;">Welcome, ${user.name}</span>
+        <button onclick="logout()">Logout</button>
+      `;
+    } else {
+      navLinks.innerHTML = `
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      `;
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("user");
+    window.location.href = "index.html";
+  }
+
+  // Runs when page is fully loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    checkUser();
+    loadTickets();
+  });
+</script>
+</body>
+</html>

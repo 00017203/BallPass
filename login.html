@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - BallPass</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <h2>BallPass</h2>
+    <div>
+      <a href="index.html">Home</a>
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="sell-form ticket-card">
+      <h1>Login</h1>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="loginUser()">Login</button>
+      <p id="loginMessage"></p>
+    </div>
+  </div>
+
+  <script>
+    async function loginUser() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("loginMessage");
+
+      const response = await fetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+  localStorage.setItem("user", JSON.stringify(data.user));
+
+  message.textContent = `Welcome, ${data.user.name}`;
+  message.style.color = "green";
+
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 1000);
+} else {
+        message.textContent = data.message;
+        message.style.color = "red";
+      }
+    }
+  </script>
+</body>
+</html>
